@@ -7,8 +7,25 @@ library(Rcompression)
 }
 
 
+getCookie =
+function(cookieFile = "cookie", host = getOption("ZoomHostname", "ucdavis.zoom.us"))
+{
+    if(file.exists(cookieFile))
+        return(readLines(cookieFile, warn = FALSE)[1])
+
+    k = ""
+    if(require("RBrowserCookies"))
+        k = getLoginCookie(host)
+
+    if(k == "")
+        stop("cannot get Zoom cookie")
+
+    k
+}
+
+
 getCon =
-function(token = NA, ..., zcookie = readLines("cookie", warn = FALSE)[1])
+function(token = NA, verbose = FALSE, ..., zcookie = getCookie())
 {
 
     hdr = c(Accept = "application/json;*/*;q=0.01",
@@ -19,7 +36,7 @@ function(token = NA, ..., zcookie = readLines("cookie", warn = FALSE)[1])
     if(!is.na(token))
         hdr['ZOOM-CSRFTOKEN'] = token
     
-    con = getCurlHandle(cookie = zcookie, verbose = TRUE, followlocation = TRUE,
+    con = getCurlHandle(cookie = zcookie, verbose = verbose, followlocation = TRUE,
                         useragent = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:83.0) Gecko/20100101 Firefox/83.0",
                         referer = "https://ucdavis.zoom.us/recording",
                         httpheader = hdr,

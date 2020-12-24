@@ -9,6 +9,12 @@ It works, but no frills - yet!
 
 # Usage
 
+First fetch the cookie from the Web browser and save it in the file named "cookie" in your working
+directory.
+You can do this via the Network tab in the browser's developer tools.
+Alternatively, you can fetch it from the Web browser's (SQLite3) database using the RBrowserCookies package.
+
+
 ```r
 library(ZoomRecordings)
 
