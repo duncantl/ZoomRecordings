@@ -28,7 +28,7 @@ function(token = NA, ..., zcookie = readLines("cookie", warn = FALSE)[1])
 
 
 getRecInfo =
-function(dates = c("", "12/18/2020"), con = getCon(), numPages = NA, h = "https://ucdavis.zoom.us/recording/host_list")    
+function(dates = c("", "12/18/2020"), con = getCon(), numPages = NA, h = "https://ucdavis.zoom.us/recording/host_list")
 {
 
     pageNum = 1L
@@ -47,7 +47,7 @@ function(dates = c("", "12/18/2020"), con = getCon(), numPages = NA, h = "https:
         pageNum = pageNum + 1L
     }
 
-    recs = lapply(pages, function(x) x$result$recordings)
+    recs = unlist(lapply(pages, function(x) x$result$recordings), recursive = FALSE)
     infoAsDF(recs)
 #    structure(unlist(, recursive = FALSE), class = "ZoomRecordingInfo")
 }
@@ -67,20 +67,25 @@ function(x)
 
     v = c("meetingStartTime", "createTime", "modifyTime")
     ans[v] = lapply(ans[v], function(x) structure(x/1000, class = c("POSIXt", "POSIXct")))
+
+    class(ans) = c("ZoomRecordingInfo", class(ans))
     ans
 }
 
 getMeetingIds =
+    # Make generic so can handle data frame or list of recording elements.
 function(recs)
 {
-    sapply(recs, `[[`, "meetingId")
+    recs$meetingId
+#    sapply(recs, `[[`, "meetingId")
 }
 
 
 getMeetingTime =
 function(recs)
 {
-  structure( sapply(recs, `[[`, "meetingStartTime")/1000, class = c("POSIXt", "POSIXct"))
+    recs$meetingStartTime
+#  structure( sapply(recs, `[[`, "meetingStartTime")/1000, class = c("POSIXt", "POSIXct"))
 }
 
 
@@ -99,3 +104,19 @@ function(mid, con = getCon(..., timeout = timeout), ..., timeout = 600)
 }
 
 
+
+
+
+# Copied from UCDGARD and Gradhub packages.
+
+savePDF = saveRawToFile = writeRawBin = writeRawToFile =
+function (object, con, size = NA_integer_, endian = .Platform$endian, useBytes = FALSE) 
+{
+    swap <- endian != .Platform$endian
+    if (is.character(con)) {
+        con <- file(con, "wb")
+        on.exit(close(con))
+    }
+    .Internal(writeBin(object, con, size, swap, useBytes))
+    con
+}
