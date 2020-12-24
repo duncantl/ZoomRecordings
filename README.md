@@ -15,24 +15,27 @@ You can do this via the Network tab in the browser's developer tools.
 Alternatively, you can fetch it from the Web browser's (SQLite3) database using the RBrowserCookies package.
 
 
+We first get the meta-data about the recordings with `getRecInfo()`:
 ```r
 library(ZoomRecordings)
 
 info = getRecInfo()
 ```
+This returns a data.frame.
 
+We access the meetingId column with the getMeetingIds() function - 
 ```r
 mids = getMeetingIds(info)
 ```
 
-Check we can download one video directly.
+Now wecheck we can download one video directly and write it to a file:
 ```r
 tmp = downloadVideo(mids[1])
 writeRawToFile(tmp, info[[1]]$meetingStartTimeStr)
 ```
 
 
-Now we download all of them
+Now we download all of them and save to them to a different directory
 ```r
 TargetDirectory = "/Volumes/T5/Sta141B/ZoomRecordings"
 filenames = format(getMeetingTime(info), "%d_%b_%Y_%H:%M.mpa")
